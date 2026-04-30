@@ -143,29 +143,47 @@ function DeleteConfirm({ title, onConfirm, onCancel, loading }: { title: string;
 function TodoItem({ todo, onToggle, onEdit, onDelete }: { todo: Todo; onToggle: () => void; onEdit: () => void; onDelete: () => void; }) {
   const overdue = isOverdue(todo.dueDate, todo.completed);
   return (
-    <div className="animate-in" style={{ display: "flex", alignItems: "flex-start", gap: "14px", padding: "16px 18px", background: "var(--surface-2)", borderRadius: "var(--radius)", border: "1px solid var(--border)", transition: "border-color 0.2s", opacity: todo.completed ? 0.65 : 1 }}
-      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "var(--border-light)"; }}
-      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "var(--border)"; }}>
-      <input type="checkbox" className="todo-checkbox" checked={todo.completed} onChange={onToggle} style={{ marginTop: "2px" }} />
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", flexWrap: "wrap", marginBottom: "4px" }}>
-          <span style={{ fontSize: "15px", fontWeight: 500, color: "var(--text)", textDecoration: todo.completed ? "line-through" : "none", wordBreak: "break-word", flex: 1 }}>{todo.title}</span>
-          <span className={`priority-${todo.priority}`} style={{ fontSize: "11px", fontWeight: 600, padding: "2px 8px", borderRadius: "99px", flexShrink: 0, letterSpacing: "0.03em" }}>
-            {PRIORITY_LABELS[todo.priority]}
-          </span>
-        </div>
-        {todo.description && <p style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "8px", lineHeight: "1.5" }}>{todo.description}</p>}
-        <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
-          {todo.dueDate && (
-            <span style={{ fontSize: "12px", color: overdue ? "var(--danger)" : "var(--text-subtle)", display: "flex", alignItems: "center", gap: "4px" }}>
-              <Calendar size={11} />{formatDate(todo.dueDate)}{overdue && " · Overdue"}
-            </span>
-          )}
-          {todo.completed && <span style={{ fontSize: "12px", color: "var(--success)", display: "flex", alignItems: "center", gap: "4px" }}><Check size={11} /> Completed</span>}
-        </div>
+    <div style={{ 
+      display: "flex", 
+      alignItems: "center", 
+      gap: "14px", 
+      padding: "12px 18px", 
+      background: "var(--surface-2)", 
+      borderRadius: "var(--radius)", 
+      border: "1px solid var(--border)",
+      width: "100%", // Explicitly set width to 100%[cite: 1]
+      boxSizing: "border-box" // Prevents padding from breaking the width[cite: 1]
+    }}>
+      {/* Checkbox */}
+      <input type="checkbox" className="todo-checkbox" checked={todo.completed} onChange={onToggle} style={{ flexShrink: 0 }} />
+      
+      {/* Middle Section: Title and Priority */}
+      <div style={{ flex: 1, display: "flex", alignItems: "center", gap: "10px", minWidth: 0 }}>
+        <span style={{ 
+          fontSize: "15px", 
+          fontWeight: 500, 
+          color: "var(--text)", 
+          textDecoration: todo.completed ? "line-through" : "none",
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis"
+        }}>
+          {todo.title}
+        </span>
+        <span className={`priority-${todo.priority}`} style={{ 
+          fontSize: "10px", 
+          fontWeight: 700, 
+          padding: "2px 8px", 
+          borderRadius: "99px",
+          flexShrink: 0 // Prevents the tag from squishing[cite: 1]
+        }}>
+          {PRIORITY_LABELS[todo.priority]}
+        </span>
       </div>
+
+      {/* Right Section: Buttons */}
       <div style={{ display: "flex", gap: "4px", flexShrink: 0 }}>
-        <button className="btn btn-ghost btn-icon btn-sm" onClick={onEdit} style={{ color: "var(--text-muted)" }}><Pencil size={14} /></button>
+        <button className="btn btn-ghost btn-icon btn-sm" onClick={onEdit}><Pencil size={14} /></button>
         <button className="btn btn-danger btn-icon btn-sm" onClick={onDelete}><Trash2 size={14} /></button>
       </div>
     </div>
@@ -333,9 +351,21 @@ export function DashboardClient({ user }: { user: User }) {
             )}
           </div>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          <div style={{ 
+            display: "flex", 
+            flexDirection: "column", 
+            gap: "12px", // Increased gap for better visual breathing room
+            width: "100%",
+            alignItems: "stretch"
+          }}>
             {filtered.map(todo => (
-              <TodoItem key={todo.id} todo={todo} onToggle={() => handleToggle(todo)} onEdit={() => setModal({ mode: "edit", todo })} onDelete={() => setDeleteTarget(todo)} />
+              <TodoItem 
+                key={todo.id} 
+                todo={todo} 
+                onToggle={() => handleToggle(todo)} 
+                onEdit={() => setModal({ mode: "edit", todo })} 
+                onDelete={() => setDeleteTarget(todo)} 
+              />
             ))}
           </div>
         )}
