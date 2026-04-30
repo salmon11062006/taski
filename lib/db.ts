@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { v4 as uuidv4 } from "uuid";
+import { randomUUID } from "crypto";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const USERS_FILE = path.join(DATA_DIR, "users.json");
@@ -49,7 +49,6 @@ export interface Todo {
   userId: string;
 }
 
-// ── User operations ──────────────────────────────────────────────────────────
 export const db = {
   users: {
     findByEmail(email: string): User | undefined {
@@ -60,37 +59,24 @@ export const db = {
     },
     create(data: Omit<User, "id" | "createdAt">): User {
       const users = readJSON<User>(USERS_FILE);
-      const user: User = {
-        id: uuidv4(),
-        createdAt: new Date().toISOString(),
-        ...data,
-      };
+      const user: User = { id: randomUUID(), createdAt: new Date().toISOString(), ...data };
       users.push(user);
       writeJSON(USERS_FILE, users);
       return user;
     },
   },
-
   todos: {
     findByUser(userId: string): Todo[] {
       return readJSON<Todo>(TODOS_FILE)
         .filter((t) => t.userId === userId)
-        .sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     },
     findById(id: string): Todo | undefined {
       return readJSON<Todo>(TODOS_FILE).find((t) => t.id === id);
     },
     create(data: Omit<Todo, "id" | "createdAt" | "updatedAt">): Todo {
       const todos = readJSON<Todo>(TODOS_FILE);
-      const todo: Todo = {
-        id: uuidv4(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        ...data,
-      };
+      const todo: Todo = { id: randomUUID(), createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), ...data };
       todos.push(todo);
       writeJSON(TODOS_FILE, todos);
       return todo;
