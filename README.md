@@ -1,1 +1,1 @@
-## You must first run "npx auth secret" before running "npm run dev" on the terminal
+
